@@ -1,0 +1,58 @@
+﻿@model AuctionWebsite.Models.SystemParameter
+@{
+    ViewBag.Title = "System";
+}
+
+<div class="row">
+    <div class="col-xs-3">
+    </div>
+    <div class="col-xs-6">
+        <div class="jumbotron">
+            <center>
+                <h4><b>System parameters</b></h4><br>
+            </center>
+            <div class="row">
+                <div class="col-xs-2"></div>
+                <div class="col-xs-8">
+                    <form>
+                        <div class="input-group">
+                            <span class="input-group-addon"><b><i>N</i></b></span>
+                            <input id="auctioncount" type="text" class="form-control" name="auctioncount" placeholder="Count of auctions per page" value="@Model.AuctionCount">
+                        </div><br>
+                        <div class="input-group">
+                            <span class="input-group-addon"><b><i>D</i></b></span>
+                            <input id="auctionduration" type="text" class="form-control" name="auctionduration" placeholder="Default auction duration [s]" value="@Model.AuctionDuration">
+                        </div><br>
+                        <div class="input-group">
+                            <span class="input-group-addon"><b><i>S</i></b></span>
+                            <input id="silvercount" type="text" class="form-control" name="silvercount" placeholder="Token count for silver package" value="@Model.SilverCount">
+                        </div><br>
+                        <div class="input-group">
+                            <span class="input-group-addon"><b><i>G</i></b></span>
+                            <input id="goldcount" type="text" class="form-control" name="goldcount" placeholder="Token count for gold package" value="@Model.GoldCount">
+                        </div><br>
+                        <div class="input-group">
+                            <span class="input-group-addon"><b><i>P</i></b></span>
+                            <input id="platinumcount" type="text" class="form-control" name="platinumcount" placeholder="Token count for platinum package" value="@Model.PlatinumCount">
+                        </div><br>
+                        <div class="input-group">
+                            <span class="input-group-addon"><b><i>C</i></b></span>
+                            <input id="currency" type="text" class="form-control" name="currency" placeholder="Currency" value="@Model.Currency">
+                        </div><br>
+                        <div class="input-group">
+                            <span class="input-group-addon"><b><i>T</i></b></span>
+                            <input id="tokenvalue" type="text" class="form-control" name="tokenvalue" placeholder="Token value per currency unit" value="@Model.TokenValue">
+                        </div>
+                        <br>
+                        <center><button type="button" class="btn btn-primary" onclick="changeSystemParameters();">Save</button></center>
+                    </form>
+                </div>
+                <div class="col-xs-2"></div>
+            </div>
+            <br>
+            <div id="systemParametersAlert"></div>
+        </div>
+    </div>
+    <div class="col-xs-3">
+    </div>
+</div>

@@ -1,0 +1,157 @@
+﻿@model IEnumerable<AuctionWebsite.Models.AuctionWithLastBid>
+@{
+    ViewBag.Title = "Won Auctions";
+}
+
+<div class="row">
+    <div class="col-xs-2">
+    </div>
+    <div class="col-xs-8">
+        <form id="search">
+            <div class="form-group row">
+                <div class="col-xs-4">
+                    <div class="active-primary-4">
+                        <input id="title" class="form-control" type="text" placeholder="Title" aria-label="Title">
+                    </div>
+                </div>
+                <div class="col-xs-2">
+                    <div class="active-primary-4">
+                        <input id="minprice" class="form-control" type="text" placeholder="Min price" aria-label="Min price">
+                    </div>
+                </div>
+                <div class="col-xs-2">
+                    <div class="active-primary-4">
+                        <input id="maxprice" class="form-control" type="text" placeholder="Max price" aria-label="Max price">
+                    </div>
+                </div>
+                <div class="col-xs-2">
+                    <div class="active-primary-4">
+                        <select id="status" class="form-control" disabled>
+                            <option value="3">Closed</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-xs-2">
+                    <button type="button" class="btn btn-primary" onclick="searchAuctions()"><span class=""><i class="glyphicon glyphicon-search"></i></span> Search</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-xs-2">
+    </div>
+</div>
+
+<div id="auctions">
+    <center>
+        <section id="articles">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <article id="item1"></article>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <article id="item2"></article>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <article id="item3"></article>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <article id="item4"></article>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <article id="item5"></article>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <article id="item6"></article>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <article id="item7"></article>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <article id="item8"></article>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <article id="item9"></article>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <article id="item10"></article>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <article id="item11"></article>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <article id="item12"></article>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <article id="item13"></article>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <article id="item14"></article>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <article id="item15"></article>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <article id="item16"></article>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <article id="item17"></article>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <article id="item18"></article>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <article id="item19"></article>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <article id="item20"></article>
+                </div>
+            </div>
+        </section>
+    </center>
+    <div class="row">
+        <div class="col-xs-2">
+        </div>
+        <div class="col-xs-8">
+            <center>
+                <ul class="pagination pagination-sm"></ul>
+            </center>
+        </div>
+        <div class="col-xs-2">
+        </div>
+    </div>
+</div>
+
+@Scripts.Render("~/js/AuctionItem.js")
+<script type="text/javascript">
+		auctionitems =
+		[
+			@foreach (var item in Model)
+            {
+                var openedOn = item.OpenedOn.HasValue ? item.OpenedOn.Value.AddSeconds(item.Duration) : DateTime.MaxValue;
+                var timeleft = (int) (openedOn - DateTime.Now.AddHours(2)).TotalSeconds;
+
+                var price = item.TokenAmount ?? item.StartingPrice;
+                var lastbidder_id = item.Bidder.ToString() ?? "";
+                var lastbidder_name = item.Bidder == null ? "" : item.FirstName + " " + item.LastName;
+
+                var user = ((AuctionWebsite.Models.User)Session["user"]);
+                var generateApproveButton = !item.OpenedOn.HasValue && user!=null && user.Administrator != 0 ? 1 : 0;
+
+                var status = 1;
+                if (item.OpenedOn != null) { status = 2; }
+                if (item.ClosedOn != null) { status = 3; }
+
+
+				@:new AuctionItem("@item.AuctionID.ToString()", "@item.Title", @timeleft, @price, "@lastbidder_name", "@lastbidder_id", @generateApproveButton, @status),
+            }
+        ];
+        articlesPerPage = @ViewBag.AuctionCount;
+</script>

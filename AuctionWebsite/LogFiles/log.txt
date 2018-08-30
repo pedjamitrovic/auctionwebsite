@@ -1,0 +1,35 @@
+2018-08-17 19:26:00,768 [82] ERROR AuctionWebsiteLogger - #Error: Wait for auction time to expire.
+2018-08-17 19:50:26,904 [5] ERROR AuctionWebsiteLogger - Proba
+2018-08-17 19:53:15,401 [7] ERROR AuctionWebsiteLogger - #Error: You can't create bid with price equal or lower than current price.
+2018-08-17 19:54:10,969 [23] ERROR AuctionWebsiteLogger - #Error: You are already last bidder.
+2018-08-17 20:21:57,967 [8] ERROR AuctionWebsiteLogger - Proba
+2018-08-17 20:24:37,601 [8] ERROR AuctionWebsiteLogger - Proba
+2018-08-17 20:24:41,243 [11] ERROR AuctionWebsiteLogger - A specified Include path is not valid. The EntityType 'AuctionWebsite.Models.Auction' does not declare a navigation property with the name 'Bid'.
+2018-08-17 20:32:35,148 [8] ERROR AuctionWebsiteLogger - Proba
+2018-08-17 21:24:02,979 [5] ERROR AuctionWebsiteLogger - Proba
+2018-08-17 21:26:02,220 [7] ERROR AuctionWebsiteLogger - #Error: You can't create bid with price equal or lower than current price.
+2018-08-17 21:43:04,464 [20] ERROR AuctionWebsiteLogger - #Error: You can't create bid with price equal or lower than current price.
+2018-08-18 11:52:42,002 [8] ERROR AuctionWebsiteLogger - Proba
+2018-08-18 13:12:07,472 [8] ERROR AuctionWebsiteLogger - Proba
+2018-08-18 14:45:26,131 [5] ERROR AuctionWebsiteLogger - Proba
+2018-08-18 14:52:57,923 [14] ERROR AuctionWebsiteLogger - #Error: You are already last bidder.
+2018-08-18 14:53:31,382 [14] ERROR AuctionWebsiteLogger - #Error: You can't create bid with price equal or lower than current price.
+2018-08-18 15:06:12,427 [8] ERROR AuctionWebsiteLogger - Proba
+2018-08-18 15:25:32,154 [8] ERROR AuctionWebsiteLogger - Proba
+2018-08-18 15:35:20,259 [8] ERROR AuctionWebsiteLogger - Proba
+2018-08-18 15:39:26,192 [8] ERROR AuctionWebsiteLogger - Proba
+2018-08-18 15:39:27,398 [10] ERROR AuctionWebsiteLogger - Nullable object must have a value.
+2018-08-18 15:39:32,499 [8] ERROR AuctionWebsiteLogger - Nullable object must have a value.
+2018-08-21 10:40:24,986 [42] ERROR AuctionWebsiteLogger - #Error: Auction has been closed.
+2018-08-21 10:40:27,671 [47] ERROR AuctionWebsiteLogger - #Error: Auction has been closed.
+2018-08-21 10:40:30,176 [42] ERROR AuctionWebsiteLogger - #Error: Auction has been closed.
+2018-08-21 10:40:37,206 [45] ERROR AuctionWebsiteLogger - #Error: Auction has been closed.
+2018-08-21 10:40:39,573 [43] ERROR AuctionWebsiteLogger - #Error: Auction has been closed.
+2018-08-21 10:48:32,852 [20] ERROR AuctionWebsiteLogger - #Error: You are already last bidder.
+2018-08-21 10:49:02,847 [20] ERROR AuctionWebsiteLogger - #Error: You can't create bid with price equal or lower than current price.
+2018-08-21 10:49:07,359 [7] ERROR AuctionWebsiteLogger - #Error: You don't have enough tokens to create bid.
+2018-08-21 10:49:13,373 [7] ERROR AuctionWebsiteLogger - #Error: You don't have enough tokens to create bid.
+2018-08-22 12:29:44,698 [7] ERROR AuctionWebsiteLogger - The connection string 'AuctionModel' in the application's configuration file does not contain the required providerName attribute."
+2018-08-22 12:29:49,981 [5] ERROR AuctionWebsiteLogger - The connection string 'AuctionModel' in the application's configuration file does not contain the required providerName attribute."
+2018-08-22 12:30:28,858 [14] ERROR AuctionWebsiteLogger - The connection string 'AuctionModel' in the application's configuration file does not contain the required providerName attribute."
+2018-08-22 12:33:37,399 [10] ERROR AuctionWebsiteLogger - Keyword not supported: 'server'.

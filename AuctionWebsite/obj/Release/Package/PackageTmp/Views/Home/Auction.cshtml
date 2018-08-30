@@ -1,0 +1,210 @@
+﻿@model AuctionWebsite.Models.Auction
+@{
+    ViewBag.Title = "Auction";
+}
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(function () {
+            var hub = $.connection.AuctionHub;
+
+            hub.client.newBid = newBid;
+            hub.client.onAuctionApproved = onAuctionApproved;
+            hub.client.onFinishAuction = onFinishAuction;
+
+            $.connection.hub.start();
+        });
+    </script>
+}
+
+@{
+    var user = ((AuctionWebsite.Models.User)Session["user"]);
+}
+<div class="row">
+    <div class="col-xs-6">
+        <div class="row">
+            <div class="col-md-12">
+                <center>
+                    <img src="~/resources/storage/auctions/@Model.ID/image.png" style="width:150px;height:150px;"><br>
+                    <h2>@Model.Title</h2><br>
+                </center>
+            </div>
+        </div>
+        <div class="row">
+            <table class="table table-hover table-condensed" style="text-align:center;">
+                <tbody>
+                    <tr>
+                        <td><b>Owner:</b></td>
+                        <td><a href="http://@HttpContext.Current.Request.ServerVariables["HTTP_HOST"]/Home/Profile/@ViewBag.OwnerID">@ViewBag.OwnerFirstName @ViewBag.OwnerLastName</a></td>
+                    </tr>
+                    <tr>
+                        <td><b>Starting price:</b></td>
+                        <td style="color:green">@Model.StartingPrice t</td>
+                    </tr>
+                    <tr>
+                        <td><b>Currency:</b></td>
+                        <td>@Model.Currency</td>
+                    </tr>
+                    <tr>
+                        <td><b>Created on:</b></td>
+                        <td>@Model.CreatedOn.ToString("dd.MM.yyyy - HH:mm:ss")</td>
+                    </tr>
+                    <tr>
+                        <td><b>Opened on:</b></td>
+                        <td id="openedOn">
+                            @{
+                                if (Model.OpenedOn.HasValue)
+                                {
+                                    var openedOn = Model.OpenedOn.HasValue ? Model.OpenedOn.Value.ToString("dd.MM.yyyy - HH:mm:ss") : "-";
+                                    @openedOn;
+                                }
+                                else
+                                {
+                                    if (!Model.OpenedOn.HasValue && user != null && user.Administrator != 0)
+                                    {
+                                        <button type="button" class="btn btn-primary btn-xs" onclick="approveAuction('@Model.ID')"> Approve</button>
+                                    }
+                                }
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>Closed on:</b></td>
+                        <td id="closedOn">
+                            @{
+                                var closedOn = Model.ClosedOn.HasValue ? Model.ClosedOn.Value.ToString("dd.MM.yyyy - HH:mm:ss") : "-";
+                                @closedOn;
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>Last bidder:</b></td>
+                        <td id="lastBidder">
+                            @if (Model.Bids.Count > 0)
+                            {
+                                <a href="http://@HttpContext.Current.Request.ServerVariables["HTTP_HOST"]/Home/Profile/@ViewBag.LastBidderID">@ViewBag.LastBidderFirstName @ViewBag.LastBidderLastName</a>
+                            }
+                            else
+                            {
+                                @:-
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>Current price:</b></td>
+                        <td style="color:green">
+                            <p>
+                            <span id="currentPrice">
+                                @{
+                                    var bids = Model.Bids.OrderByDescending(o => o.CreatedOn);
+                                    var lastBidPrice = bids.Count() != 0 ? bids.First().TokenAmount : Model.StartingPrice;
+                                    @lastBidPrice;
+                                }
+                            </span> t</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>Time left:</b></td>
+                        <td>
+                            <p id="timeleft">
+                                @{
+                                    if (Model.OpenedOn.HasValue)
+                                    {
+                                        var timeleft = Model.OpenedOn.HasValue ? (int)(Model.OpenedOn.Value.AddSeconds(Model.Duration) - DateTime.Now.AddHours(2)).TotalSeconds : 0;
+                                        if (timeleft < 0)
+                                        {
+                                            timeleft = 0;
+                                        }
+                                        if (Model.ClosedOn.HasValue)
+                                        {
+                                            @:Closed.
+                                        }
+                                        else
+                                        {
+                                            @timeleft;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        @:Not opened yet.
+                                    }
+                                }
+                            </p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        @if (user != null && user.ID.ToString() != @Model.Owner.ToString())
+        {
+            <div class="row">
+                <div class="col-xs-1"></div>
+                <div class="col-xs-10">
+                    <form>
+                        <div class="input-group">
+                            <span class="input-group-addon"><b><i>T</i></b></span>
+                            <input id="newPrice" type="text" class="form-control" name="newPrice" value="@lastBidPrice">&nbsp;
+                            <button id="bidButton" type="button" class="btn btn-primary btn-bid" onclick="createBid('@user.ID.ToString()', '@Model.ID.ToString()');" style="width:100px;">Bid</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-xs-1"></div>
+            </div>
+            <div class="row">
+                <div class="col-xs-1"></div>
+                <div class="col-xs-10">
+                    <div id="bidResponse"></div>
+                </div>
+                <div class="col-xs-1"></div>
+            </div>
+        }
+        @if (user != null && user.ID.ToString() == @Model.Owner.ToString())
+        {
+            <div class="row">
+                <div class="col-xs-1"></div>
+                <div class="col-xs-10">
+                    <center><button id="finishAuctionButton" type="button" class="btn btn-primary" onclick="finishAuction('@user.ID.ToString()', '@Model.ID.ToString()');" style="width:150px;">Finish auction</button> </center>
+                </div>
+                <div class="col-xs-1"></div>
+            </div>
+            <div class="row">
+                <div class="col-xs-1"></div>
+                <div class="col-xs-10">
+                    <div id="finishAuctionResponse"></div>
+                </div>
+                <div class="col-xs-1"></div>
+            </div>
+        }
+    </div>
+    <div class="col-xs-6">
+        <center><h2>Bid history:</h2></center>
+        <table id="bidHistory" class="table table-hover table-condensed" style="text-align:center;">
+            <thead>
+                <tr>
+                    <th><center>Created on</center></th>
+                    <th><center>Bidder</center></th>
+                    <th><center>Token amount</center></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (AuctionWebsite.Models.Bid bid in Model.Bids.OrderByDescending(o => o.CreatedOn))
+                {
+                    <tr>
+                        <td>
+                            @{
+                                @bid.CreatedOn.ToString("dd.MM.yyyy - HH:mm:ss");
+                            }
+                        </td>
+                        <td><a href="http://@HttpContext.Current.Request.ServerVariables["HTTP_HOST"]/Home/Profile/@bid.User.ID">@bid.User.FirstName @bid.User.LastName</a></td>
+                        <td>@bid.TokenAmount</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@Scripts.Render("~/js/auction.js")
+<script type="text/javascript">
+    auctionID = "@Model.ID.ToString()";
+</script>

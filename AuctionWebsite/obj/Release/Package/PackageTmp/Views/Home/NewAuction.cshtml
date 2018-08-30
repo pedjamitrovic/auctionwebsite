@@ -1,0 +1,54 @@
+﻿@{
+    ViewBag.Title = "Create Auction";
+}
+
+<div class="row">
+    <div class="col-xs-3">
+    </div>
+    <div class="col-xs-6">
+        <div class="jumbotron">
+            <center>
+                <h4><b>Create Auction</b></h4><br>
+            </center>
+            <div class="row">
+                <div class="col-xs-2"></div>
+                <div class="col-xs-8">
+                    <form>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-tags"></i></span>
+                            <input id="productname" type="text" class="form-control" name="productname" placeholder="Product name">
+                        </div><br>
+                        <div class="input-group">
+                            <span class="input-group-addon"><b><i>T</i></b></span>
+                            <input id="startingprice" type="text" class="form-control" name="startingprice" placeholder="Starting price [tokens]">
+                        </div><br>
+	                    <div class="input-group">
+		                    <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
+		                    <input id="auctionduration" type="text" class="form-control" name="auctionduration" placeholder="Auction duration [s]">
+	                    </div><br><center>
+	                    <div>
+		                    <button id="attach" type="button" class="btn btn-link" onclick="$('input#attach-files').click();"><i class="fa fa-file-zip-o"></i> Attach image (.png only)</button>
+		                    <input id="attach-files" type="file" style="display: none;" accept=".png">
+		                    <center><p id="attached-files-display" style="font-size:small;"></p></center>
+		                    <script type="text/javascript">
+								$("input#attach-files").change(function (event) {
+                    				var names = $.map($(this).prop("files"), function (val) { return val.name; });
+
+                    				var filenames = "";
+                    				for (var i = 0; i < names.length; i++)
+                    					filenames += names[i] + " | ";
+                                    $("p#attached-files-display").html("Attached: " + filenames.substring(0, filenames.length - 3) + " <i class=\"alert-success glyphicon glyphicon-ok\"></i>");
+                    			});
+                    		</script>
+	                    </div></center>
+	                    <div id="createAuctionAlert"> </div>
+	                    <center><button type="button" class="btn btn-primary" onclick="createAuction();">Create</button></center>
+                    </form>
+                </div>
+                <div class="col-xs-2"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-3">
+    </div>
+</div>

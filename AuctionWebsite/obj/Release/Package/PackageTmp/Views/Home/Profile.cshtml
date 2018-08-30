@@ -1,0 +1,227 @@
+﻿@model AuctionWebsite.Models.User
+@{
+    ViewBag.Title = "Profile";
+}
+
+@section scripts
+{
+    <script type="text/javascript">
+        var id = "@Model.ID.ToString()";
+        $(function () {
+            $(".packages").hide();
+
+            var hub = $.connection.AuctionHub;
+
+            hub.client.centiliNotify = function (clientId, status) {
+                alert(clientId + " " + status);
+            };
+            hub.client.onChangeInfo = onChangeInfo;
+            hub.client.onOrderTokens = onOrderTokens;
+            hub.client.onNotify = onNotify;
+
+            $.connection.hub.start();
+        });
+        function showPackages() {
+            $(":radio").attr("checked", false);
+            $(".packages").fadeIn();
+        }
+        function onChangeInfo(userID, name, email) {
+            if (userID !== id) return;
+            $("#nameLabel").html("<b>" + name + "</b>");
+            $("#emailLabel").html(email);
+            $("#" + userID).html(name);
+        }
+        function onOrderTokens(userID, orderID, tokenamount, currency, tokenvalue, state) {
+            if (userID !== id) return;
+            var stateHtml;
+            switch (state) {
+                case 0:
+                    stateHtml = "<td class=\"text-warning\"><b>SUBMITTED</b></td>";
+                    break;
+                case 1:
+                    stateHtml = "<td class=\"text-success\"><b>COMPLETED</b></td>";
+                    break;
+                case 2:
+                    stateHtml = "<td class=\"text-danger\"><b>CANCELED</b></td>";
+                    break;
+            }
+            var transactionHistory = $("#transactionHistory tbody");
+            transactionHistory.prepend("<tr id=\"" + orderID + "\">" +
+                "<td>" + tokenamount + " t</td>" +
+                "<td>" + currency + "</td>" +
+                "<td>" + tokenvalue + "</td>" +
+                stateHtml +
+                "</tr>");
+            getcentilibutton(orderID, $("input:radio[name=package]:checked").val());
+        }
+        function onNotify(userID, orderID, state, tokenamount) {
+            if (userID !== id) return;
+            var stateHtml;
+            switch (state) {
+                case 1:
+                    stateHtml = "<td class=\"text-success\"><b>COMPLETED</b></td>";
+                    break;
+                case 2:
+                    stateHtml = "<td class=\"text-danger\"><b>CANCELED</b></td>";
+                    break;
+            }
+            var stateColumn = $("#" + orderID + " td:nth-child(4)").remove();
+            $("#" + orderID).append(stateHtml);
+            $("#amountLabel").html(tokenamount); 
+        }
+        function centiliNotify(reference, status) {
+            alert(reference + " " + status);
+        }
+    </script>
+}
+
+<div class="modal fade" id="profileInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <center><h5 class="modal-title" id="loginModal"><span class="text-muted">Change your personal information</span></h5></center>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-xs-offset-2 col-xs-8">
+                        <form>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                <input id="firstname" type="text" class="form-control" name="firstname" placeholder="First Name" value="@Model.FirstName">
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                <input id="lastname" type="text" class="form-control" name="lastname" placeholder="Last Name" value="@Model.LastName">
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
+                                <input id="email" type="text" class="form-control" name="email" placeholder="Email" value="@Model.Email">
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                                <input id="password" type="password" class="form-control" name="password" placeholder="Password" value="">
+                            </div>
+                            <br>
+                        </form>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12" id="profileInfoModalAlert">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="profileInfoButton" type="button" class="btn btn-primary" onclick="changeInfo('@Model.ID.ToString()')">Change</button>
+            </div>
+        </div>
+    </div>
+</div>
+@{
+    var user = ((AuctionWebsite.Models.User)Session["user"]);
+}
+<div class="row">
+    <div class="col-md-12">
+        <center>
+            <img src="~/resources/pictures/profile.jpg" style="width:150px;height:150px;"><br>
+            <h2 id="nameLabel"><b>@Model.FirstName @Model.LastName</b></h2>
+
+            @if (user != null && user.ID.ToString() == Model.ID.ToString())
+            {
+                <center><button type="button" class="btn btn-primary btn-xs modals" data-toggle="modal" data-target="#profileInfoModal">Change info</button></center><br>
+            }
+        </center>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+        <table class="table table-hover table-condensed" style="text-align:center;">
+            <tbody>
+                <tr>
+                    <td>Email:</td>
+                    <td id="emailLabel">@Model.Email</td>
+                </tr>
+                @{
+                    if (user != null && user.ID.ToString() == Model.ID.ToString())
+                    {
+
+                        <tr>
+                            <td>Balance:</td>
+                            <td><span id="amountLabel">@Model.TokenAmount</span> t <button type="button" class="btn btn-success btn-xs" onclick="showPackages()">Buy more</button></td>
+                        </tr>
+                        <tr class="packages">
+                            <td colspan="2">
+                                Pick desired package:<br>
+                                <input type="radio" id="silver"
+                                       name="package" value="0">
+                                <label for="contactChoice1" style="color:silver;">SILVER - @ViewBag.SilverCount t</label>
+
+                                <input type="radio" id="gold"
+                                       name="package" value="1">
+                                <label for="contactChoice2" style="color:gold;">GOLD - @ViewBag.GoldCount t</label>
+
+                                <input type="radio" id="platinum"
+                                       name="package" value="2">
+                                <label for="contactChoice3" style="color:springgreen;">PLATINUM - @ViewBag.PlatinumCount t</label><br>
+                                <button type="button" class="btn btn-primary btn-xs" onclick="orderTokens('@user.ID.ToString()')">Show payment options</button>
+                            </td>
+                        </tr>
+                        <tr class="packages">
+                            <td id="centililink" colspan="2"></td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-3"></div>
+</div>
+<br><br>
+@if (user != null && user.ID.ToString() == Model.ID.ToString())
+{
+    <div class="row">
+        <div class="col-md-3">
+
+        </div>
+        <div class="col-md-6">
+            <center><h4><b>Previous transactions</b></h4></center>
+            <table id="transactionHistory" class="table table-hover table-condensed" style="text-align:center;">
+                <thead>
+                    <tr>
+                        <th><center>Amount</center></th>
+                        <th><center>Currency</center></th>
+                        <th><center>Price Rate</center></th>
+                        <th><center>Status</center></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (AuctionWebsite.Models.TokenOrder t in ViewBag.Transactions)
+                    {
+                        <tr id="@t.ID.ToString()">
+                            <td>@t.TokenAmount t</td>
+                            <td>@t.Currency</td>
+                            <td>@t.TokenValue</td>
+                            @if (t.State == 0)
+                            {
+                                <td class="text-warning"><b>SUBMITTED</b></td>
+                            }
+                            else if (t.State == 1)
+                            {
+                                <td class="text-success"><b>COMPLETED</b></td>
+                            }
+                            else if (t.State == 2)
+                            {
+                                <td class="text-danger"><b>CANCELED</b></td>
+                            }
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-3">
+
+        </div>
+    </div>
+}
